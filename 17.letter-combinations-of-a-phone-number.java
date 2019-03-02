@@ -54,26 +54,24 @@ class Solution {
     }
 
     public List<String> letterCombinations(String digits) {
-        
         return digits.chars()
             .mapToObj(c -> (char)c)
             .map(Character::getNumericValue)
             .map(numpadLetters::get)
-            .reduce((result, list) -> result == null
-                ? list
-                : merge(result, list)
-            )
+            .reduce(this::merge)
             .orElse(new LinkedList<String>());
     }
 
     private List<String> merge(List<String> base, List<String> result) {
-        return base.stream()
-            .map(str -> result.stream()
-                .map(letter -> str + letter)
-                .collect(Collectors.toList())
-            )
-            .flatMap(List::stream)
-            .collect(Collectors.toList());
+        return base == null
+            ? result
+            : base.stream()
+                .map(str -> result.stream()
+                    .map(letter -> str + letter)
+                    .collect(Collectors.toList())
+                )
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 }
 
