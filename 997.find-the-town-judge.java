@@ -101,6 +101,11 @@ class Solution {
      * Runtime: O(2n) -> O(n)
      * 
      * TODO: Is there a better solution ?
+     * 
+     * Update: it seems like we call .getValue on the townRelationShip Map just for the size
+     * --> this mean that we dont actually use the trusterList here
+     * --> could be replaced with count
+     * --> Memory complexity is O(n)
      */
 
     public int findJudge(int N, int[][] trust) {
