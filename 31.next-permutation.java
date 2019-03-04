@@ -2,6 +2,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javafx.scene.effect.Light.Distant;
+
 /*
  * @lc app=leetcode id=31 lang=java
  *
@@ -34,15 +36,15 @@ import java.util.Map;
 class Solution {
     public void nextPermutation(int[] nums) {
 
+        boolean uglyCase = false;
+
         for(int i = nums.length - 1; i >= 0; i--) {
 
             if(i == 0) {
                 int left = 0;
                 int right = nums.length - 1;
                 while(left < right) {
-                    nums[left] = nums[left] ^ nums[right];
-                    nums[right] = nums[right] ^ nums[left];
-                    nums[left] = nums[left] ^ nums[right];
+                    swap2Index(nums, left, right);
                     left++;
                     right--;
                 }
@@ -50,15 +52,40 @@ class Solution {
             }
 
             if(nums[i] > nums[i-1]) {
-                nums[i] = nums[i] ^ nums[i-1];
-                nums[i-1] = nums[i-1] ^ nums[i];
-                nums[i] = nums[i] ^ nums[i-1];
+                if (uglyCase) {
+                    int closestBiggerIndex = i;
+                    for (int j = i; j < nums.length; j++) {
+                        int minDistant = nums[closestBiggerIndex] - nums[i-1];
+                        int currentDistant = nums[j] - nums[i-1];
+                        if ( currentDistant > 0 && currentDistant < minDistant) {
+                            minDistant = currentDistant;
+                            closestBiggerIndex = j;
+                        }
+                    }
+
+                    swap2Index(nums, closestBiggerIndex, i-1);
+
+                    // sort nums[i -> nums.length - 1] ascending
+                    Arrays.sort(nums, i, nums.length);
+                } else {
+                    swap2Index(nums, i, i-1);
+                }
                 return;
+            }
+
+            if(nums[i] < nums[i-1] && !uglyCase) {
+                uglyCase = true;
             }
         }
     }
 
-    // Run with 
+    private void swap2Index(int[] arr, int idx1, int idx2) {
+        arr[idx1]   = arr[idx1]   ^ arr[idx2];
+        arr[idx2] = arr[idx2] ^ arr[idx1];
+        arr[idx1]   = arr[idx1]   ^ arr[idx2];
+    }
+
+    // Run with javac 31.next-permutation.java && java -cp . Solution
     public static void main(String[] args) {
         // Test case -> Expected result map
         Map<int[], int[]> testAndResultMap = new LinkedHashMap<>();
@@ -67,11 +94,15 @@ class Solution {
         testAndResultMap.put(new int[]{1, 1, 1},  new int[]{1, 1, 1});
 
         // Sorting order cases
-        // TODO: these tests are failing
         testAndResultMap.put(new int[]{1, 2, 3},  new int[]{1, 3, 2});
         testAndResultMap.put(new int[]{1, 3, 2},  new int[]{2, 1, 3});
         testAndResultMap.put(new int[]{1, 8, 2, 7, 3},  new int[]{1, 8, 3, 2, 7});
         testAndResultMap.put(new int[]{1, 2, 8, 7, 3},  new int[]{1, 3, 2, 7, 8});
+        testAndResultMap.put(new int[]{1, 2, 8, 7, 3, 3},  new int[]{1, 3, 2, 3, 7, 8});
+        testAndResultMap.put(new int[]{1, 2, 8, 7, 3, 4},  new int[]{1, 2, 8, 7, 4, 3});
+
+        testAndResultMap.put(new int[]{2, 3, 1},  new int[]{3, 1, 2});
+        testAndResultMap.put(new int[]{3, 9, 8, 2, 1},  new int[]{8, 1, 2, 3, 9});
 
         // Reseting order cases
         testAndResultMap.put(new int[]{3, 2, 1},  new int[]{1, 2, 3});
