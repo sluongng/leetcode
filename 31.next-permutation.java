@@ -2,8 +2,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javafx.scene.effect.Light.Distant;
-
 /*
  * @lc app=leetcode id=31 lang=java
  *
@@ -54,7 +52,7 @@ class Solution {
             if(nums[i] > nums[i-1]) {
                 if (uglyCase) {
 
-                    // Traverse form right to left
+                    // Traverse from right to left
                     // all elements are in increasing orders
                     // nums[i-1] is the first drop in value
 
