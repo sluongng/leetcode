@@ -82,58 +82,68 @@
  * 
  */
 class Solution {
+
+    // Previous solution using recursion was working
+    // But leetcode test cases seem to be test for memory/running time also
+    // Recursion has residual on the system stack and resulted a longer running time
+
+    // This is a solution that is a lot harder to follow
+    // but has O(n) run time and O(1) mem spc complx
+
     public boolean isMatch(String s, String p) {
+        // Index to track current position in s and p
+        int sIndex = 0;
+        int pIndex = 0;
 
-        if (p.length() == 0) {
-            return s.length() == 0;
-        }
-        if (s.length() == 0) {
-            for (int i = 0; i < p.length(); i++) {
-                if (p.charAt(i) != '*') {
-                    return false;
-                }
-            }
-            return true;
-        }
+        // Temp store position of sIndex and pIndex to revisit
+        int sStore = -1;
+        int pStore = -1;
 
-        char[] pattern = p.toCharArray();
-        char[] stringArr = s.toCharArray();
+        // Goal here is to reach the end of S in any mean possible
+        while (sIndex < s.length() ) {
 
-        for (int j = 0; j < pattern.length; j++) {
-            switch (pattern[j]) {
-                case '*':
-                    if (j == pattern.length - 1) {
-                        return true;
-                    }
+            boolean pIsInRange = pIndex < p.length();
 
-                    int nextNonStarIndex = j + 1;
-                    for (int i = j + 1; i < pattern.length; i++) {
-                        if (pattern[i] == '*') {
-                            nextNonStarIndex++;
-                        } else {
-                            break;
-                        }
-                    }
-                    if (nextNonStarIndex == pattern.length) {
-                        return true;
-                    }
+            if (pIsInRange && (p.charAt(pIndex) == '?' || p.charAt(pIndex) == s.charAt(sIndex))) {
 
-                    for (int i = j; i < stringArr.length; i++) {
-                        if (isMatch(s.substring(i), p.substring(nextNonStarIndex))) {
-                            return true;
-                        }
-                    }
-                    return false;
-                case '?':
-                    return isMatch(s.substring(j + 1), p.substring(j + 1));
-                default:
-                    if (j >= stringArr.length || pattern[j] != stringArr[j]) {
-                        return false;
-                    }
-                    break;
+                // Very straight forward
+                sIndex++;
+                pIndex++;
+
+            } else if (pIsInRange && p.charAt(pIndex) == '*') {
+
+                // Store index as mark
+                sStore = sIndex;
+                pStore = pIndex;
+
+                // Proceed the loop with the starchar being skipped
+                pIndex++;
+
+            } else if (sStore != -1) {
+
+                // if previously there were something stored
+                // take those value out and use them as indexes
+                sIndex = sStore + 1;
+                pIndex = pStore + 1;
+
+                // We also increase sStore so that we dont repeat infinite loop
+                // This helps the while loop proceed and terminate eventually
+                sStore++;
+
+            } else {
+
+                // If no stored and easy case :D
+                return false;
             }
         }
 
-        return true;
+        // Handle the dangling *** at the end of pattern
+        while (pIndex < p.length() && p.charAt(pIndex) == '*') {
+            pIndex++;
+        }
+
+        // Now that sIndex has reached its length and pIndex has reached the last none-star char
+        // Check if pattern has any left over
+        return pIndex == p.length();
     }
 }

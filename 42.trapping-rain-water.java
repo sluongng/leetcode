@@ -1,5 +1,3 @@
-import java.util.stream.IntStream;
-
 /*
  * @lc app=leetcode id=42 lang=java
  *
