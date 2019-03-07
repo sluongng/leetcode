@@ -160,8 +160,19 @@ class Solution {
         }
 
         return atomList.entrySet().stream()
-            .map(entry -> entry.getKey() + entry.getValue().toString())
+            .sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey()))
+            .map(entry -> entry.getValue() > 1
+                ? entry.getKey() + entry.getValue()
+                : entry.getKey())
             .collect(Collectors.joining());
+    }
+
+    public static void main(String[] xargs) {
+        Solution solution = new Solution();
+
+        System.out.println(solution.countOfAtoms("H20"));
+        System.out.println(solution.countOfAtoms("Mg(OH)2"));
+        System.out.println(solution.countOfAtoms("K4(ON(SO3)2)2"));
     }
 }
 
