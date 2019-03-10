@@ -104,6 +104,10 @@ class Solution {
 
         // Then we pop the bracketStack and merge the count of 2 HashMap by key
 
+        if (formula.length() == 1) {
+            return formula;
+        }
+
 
         Stack<Map<String, Integer>> bracketStack = new Stack<Map<String, Integer>>();
         Map<String, Integer> atomList = new LinkedHashMap<String, Integer>();
@@ -113,8 +117,8 @@ class Solution {
 
         for (int i = 0; i < formula.length(); i++) {
 
-            char currChar = formular.charAt(i);
-            boolean isLastChar = (i == formular.length() - 1) 
+            char currChar = formula.charAt(i);
+            boolean isLastChar = (i == formula.length() - 1);
 
             // isTokenTerminated is used to determine whether 
             // we should flush the 2 buffers in 
@@ -123,100 +127,91 @@ class Solution {
 
             boolean isTokenTerminated = isLastChar;
             if (!isLastChar) {
-                nextChar = formular.charAt(i+1);
+                char nextChar = formula.charAt(i+1);
                 
                 isTokenTerminated |= Character.isUpperCase(nextChar);
                 isTokenTerminated |= nextChar == '(';
                 isTokenTerminated |= nextChar == ')';
             }
 
+            if (Character.isLowerCase(currChar)) {
 
-            if (Character.isLowerCase(currChar) {
+                atom.append(currChar);
 
-            } else if (Character.isUpperCase(currChar) {
+            } else if (Character.isUpperCase(currChar)) {
 
-            } else if () {
+                atom.append(currChar);
 
-            }
+            } else if (Character.isDigit(currChar)) {
 
+                numberString.append(currChar);
 
-            // NOT FINISHED CODE ABOVE
-            // OLD SOLUTION BELOW
+            } else if (currChar == '(') {
 
-
-            char currentChar = formula.charAt(i);
-            
-            if (Character.isLowerCase(currentChar)) {
-
-                atom.append(currentChar);
-
-            } else if (Character.isUpperCase(currentChar)) {
-
-                String currentAtom = atom.toString();
-                if (atomList.containsKey(currentAtom)) {
-                    atomList.replace(currentAtom, atomList.get(currentAtom) + 1);
-                } else {
-                    atomList.put(currentAtom, 1);
-                }
-
-                atom = new StringBuilder().append(currentChar);
-
-            } else if (Character.isDigit(currentChar)) {
-
-                StringBuilder builder = new StringBuilder().append(currentChar);
-                while(i+1 < formula.length() && Character.isDigit(formula.charAt(i + 1))) {
-                    i++;
-                    builder.append(formula.charAt(i));
-                }
-
-                String currentAtom = atom.toString();
-                Integer count = Integer.valueOf(builder.toString());
-                if (atomList.containsKey(currentAtom)) {
-                    atomList.replace(currentAtom, atomList.get(currentAtom) + count);
-                } else {
-                    atomList.put(currentAtom, count);
-                }
-
-                atom = new StringBuilder();
-
-            } else if (currentChar == '(') {
-
-                // handle bracket
-                bracketStack.add(atomList);
+                bracketStack.push(atomList);
                 atomList = new LinkedHashMap<String, Integer>();
 
-            } else if (currentChar == ')') {
-                // handle bracket
+            } else if (currChar == ')') {
+
+                // Missing logic to handle chain bracket closing such as ")2)3))"
+                // Need to fix
+                // if (formula.charAt(i+1) != '(' && Character.isAlphabet(formula.charAt(i+1)))
+
                 int multiplier = 1;
-                if (i + 1 < formula.length() && Character.isDigit(i + 1)) {
-                    StringBuilder builder = new StringBuilder();
-                    while(i + 1 < formula.length() && Character.isDigit(i + 1)) {
+                if (!isTokenTerminated) {
+                    i++;
+
+                    while(i < formula.length() && Character.isDigit(formula.charAt(i))) {
+                        numberString.append(formula.charAt(i));
                         i++;
-                        builder.append(formula.charAt(i));
                     }
-                    multiplier = Integer.valueOf(builder.toString());
+
+                    multiplier = Integer.valueOf(numberString.toString());
+                    numberString = new StringBuilder();
                 }
                 final int multiplierFinal = multiplier;
 
-                Map<String, Integer> oldStack = bracketStack.pop();
+                Map<String, Integer> oldAtomList = bracketStack.pop();
 
                 atomList.entrySet().stream()
                     .forEach(entry -> {
-                        int newValue;
+                        int valueToAdd = entry.getValue() * multiplierFinal;
 
-                        if(oldStack.containsKey(entry.getKey())) {
-                            newValue = (entry.getValue() * multiplierFinal) + oldStack.get(entry.getKey());
+                        if (oldAtomList.containsKey(entry.getKey())) {
+                            valueToAdd += oldAtomList.get(entry.getKey());
+
+                            oldAtomList.replace(entry.getKey(), valueToAdd);
+                            
                         } else {
-                            newValue = entry.getValue() * multiplierFinal;
+                            oldAtomList.put(entry.getKey(), valueToAdd);
                         }
 
-                        oldStack.replace(entry.getKey(), newValue);
-                   });
+                    });
 
-                atomList = oldStack;
+                atomList = oldAtomList;
 
-            } else {
-                System.out.println("Extra char: " + currentChar);
+                isTokenTerminated = false;
+            }
+
+            if (isTokenTerminated) {
+
+                String atomName = atom.toString();
+                String countStr = numberString.toString();
+                int atomCount = countStr.isEmpty() ? 1 : Integer.valueOf(countStr);
+
+                if (!atomName.isEmpty()) {
+                    if(atomList.containsKey(atomName)) {
+                        atomList.replace(
+                            atomName,
+                            atomList.get(atomName) + atomCount
+                        );
+                    } else {
+                        atomList.put(atomName, atomCount);
+                    }
+                }
+
+                atom = new StringBuilder();
+                numberString = new StringBuilder();
             }
         }
 
@@ -231,9 +226,10 @@ class Solution {
     public static void main(String[] xargs) {
         Solution solution = new Solution();
 
-        System.out.println(solution.countOfAtoms("H20"));
+        // System.out.println(solution.countOfAtoms("H20"));
+        System.out.println(solution.countOfAtoms("O(O(O))"));
         System.out.println(solution.countOfAtoms("Mg(OH)2"));
-        System.out.println(solution.countOfAtoms("K4(ON(SO3)2)2"));
+        System.out.println(solution.countOfAtoms("K4(ON4(SO3)2)2"));
     }
 }
 
