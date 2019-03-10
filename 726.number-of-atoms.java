@@ -78,11 +78,72 @@ import java.util.stream.Collectors;
 class Solution {
     public String countOfAtoms(String formula) {
 
+        // Valid Token:
+        // Starting character must be Capitalized
+        // Token RegEx: ([A-Z][a-z]*[0-9]*)
+
+        // Solution is to store the current atom name
+        // into a StringBuilder as we iterate through the string
+
+        // We call this a "Token"
+
+        // The Suffix number of the Token (which could be multiple digits)
+        // will be tracked via a separate StringBuilder "numberString"
+
+        // These 2 StringBuilder(s) (aka. Buffers) will be flushed
+        // and stored into "atomList" HashMap to keep track of the count
+        // Then the 2 buffers will be replaced with empty ones for next "Token"
+
+
+        // To handle Brackets,
+        // we push current atomList HashMap into a Stack when the bracket begin
+        // and use a new HashMap to keep count inside the bracket 
+
+        // When the bracket is closed, we take the number following the bracket 
+        // and multiply it to all the current count in atomList
+
+        // Then we pop the bracketStack and merge the count of 2 HashMap by key
+
+
         Stack<Map<String, Integer>> bracketStack = new Stack<Map<String, Integer>>();
         Map<String, Integer> atomList = new LinkedHashMap<String, Integer>();
 
         StringBuilder atom = new StringBuilder();
+        StringBuilder numberString = new StringBuilder();
+
         for (int i = 0; i < formula.length(); i++) {
+
+            char currChar = formular.charAt(i);
+            boolean isLastChar = (i == formular.length() - 1) 
+
+            // isTokenTerminated is used to determine whether 
+            // we should flush the 2 buffers in 
+            // atom and numberString
+            // and store the content into current atomList
+
+            boolean isTokenTerminated = isLastChar;
+            if (!isLastChar) {
+                nextChar = formular.charAt(i+1);
+                
+                isTokenTerminated |= Character.isUpperCase(nextChar);
+                isTokenTerminated |= nextChar == '(';
+                isTokenTerminated |= nextChar == ')';
+            }
+
+
+            if (Character.isLowerCase(currChar) {
+
+            } else if (Character.isUpperCase(currChar) {
+
+            } else if () {
+
+            }
+
+
+            // NOT FINISHED CODE ABOVE
+            // OLD SOLUTION BELOW
+
+
             char currentChar = formula.charAt(i);
             
             if (Character.isLowerCase(currentChar)) {
