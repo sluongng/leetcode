@@ -94,12 +94,11 @@ class Solution {
         // and stored into "atomList" HashMap to keep track of the count
         // Then the 2 buffers will be replaced with empty ones for next "Token"
 
-
         // To handle Brackets,
         // we push current atomList HashMap into a Stack when the bracket begin
-        // and use a new HashMap to keep count inside the bracket 
+        // and use a new HashMap to keep count inside the bracket
 
-        // When the bracket is closed, we take the number following the bracket 
+        // When the bracket is closed, we take the number following the bracket
         // and multiply it to all the current count in atomList
 
         // Then we pop the bracketStack and merge the count of 2 HashMap by key
@@ -107,7 +106,6 @@ class Solution {
         if (formula.length() == 1) {
             return formula;
         }
-
 
         Stack<Map<String, Integer>> bracketStack = new Stack<Map<String, Integer>>();
         Map<String, Integer> atomList = new LinkedHashMap<String, Integer>();
@@ -120,15 +118,15 @@ class Solution {
             char currChar = formula.charAt(i);
             boolean isLastChar = (i == formula.length() - 1);
 
-            // isTokenTerminated is used to determine whether 
-            // we should flush the 2 buffers in 
+            // isTokenTerminated is used to determine whether
+            // we should flush the 2 buffers in
             // atom and numberString
             // and store the content into current atomList
 
             boolean isTokenTerminated = isLastChar;
             if (!isLastChar) {
-                char nextChar = formula.charAt(i+1);
-                
+                char nextChar = formula.charAt(i + 1);
+
                 isTokenTerminated |= Character.isUpperCase(nextChar);
                 isTokenTerminated |= nextChar == '(';
                 isTokenTerminated |= nextChar == ')';
@@ -153,15 +151,14 @@ class Solution {
 
             } else if (currChar == ')') {
 
-                // Missing logic to handle chain bracket closing such as ")2)3))"
-                // Need to fix
-                // if (formula.charAt(i+1) != '(' && Character.isAlphabet(formula.charAt(i+1)))
+                // Something wrong here
 
                 int multiplier = 1;
+
                 if (!isTokenTerminated) {
                     i++;
 
-                    while(i < formula.length() && Character.isDigit(formula.charAt(i))) {
+                    while (i < formula.length() && Character.isDigit(formula.charAt(i))) {
                         numberString.append(formula.charAt(i));
                         i++;
                     }
@@ -171,22 +168,20 @@ class Solution {
                 }
                 final int multiplierFinal = multiplier;
 
-                Map<String, Integer> oldAtomList = bracketStack.pop();
+                Map<String, Integer> oldAtomList = bracketStack.empty() ? new LinkedHashMap<>() : bracketStack.pop();
 
-                atomList.entrySet().stream()
-                    .forEach(entry -> {
-                        int valueToAdd = entry.getValue() * multiplierFinal;
+                atomList.entrySet().stream().forEach(entry -> {
+                    int valueToAdd = entry.getValue() * multiplierFinal;
 
-                        if (oldAtomList.containsKey(entry.getKey())) {
-                            valueToAdd += oldAtomList.get(entry.getKey());
+                    if (oldAtomList.containsKey(entry.getKey())) {
+                        valueToAdd += oldAtomList.get(entry.getKey());
 
-                            oldAtomList.replace(entry.getKey(), valueToAdd);
-                            
-                        } else {
-                            oldAtomList.put(entry.getKey(), valueToAdd);
-                        }
+                        oldAtomList.replace(entry.getKey(), valueToAdd);
 
-                    });
+                    } else {
+                        oldAtomList.put(entry.getKey(), valueToAdd);
+                    }
+                });
 
                 atomList = oldAtomList;
 
@@ -200,11 +195,8 @@ class Solution {
                 int atomCount = countStr.isEmpty() ? 1 : Integer.valueOf(countStr);
 
                 if (!atomName.isEmpty()) {
-                    if(atomList.containsKey(atomName)) {
-                        atomList.replace(
-                            atomName,
-                            atomList.get(atomName) + atomCount
-                        );
+                    if (atomList.containsKey(atomName)) {
+                        atomList.replace(atomName, atomList.get(atomName) + atomCount);
                     } else {
                         atomList.put(atomName, atomCount);
                     }
@@ -215,21 +207,36 @@ class Solution {
             }
         }
 
-        return atomList.entrySet().stream()
-            .sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey()))
-            .map(entry -> entry.getValue() > 1
-                ? entry.getKey() + entry.getValue()
-                : entry.getKey())
-            .collect(Collectors.joining());
+        return atomList.entrySet().stream().sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey()))
+                .map(entry -> entry.getValue() > 1 ? entry.getKey() + entry.getValue() : entry.getKey())
+                .collect(Collectors.joining());
     }
 
     public static void main(String[] xargs) {
         Solution solution = new Solution();
 
-        // System.out.println(solution.countOfAtoms("H20"));
-        System.out.println(solution.countOfAtoms("O(O(O))"));
-        System.out.println(solution.countOfAtoms("Mg(OH)2"));
-        System.out.println(solution.countOfAtoms("K4(ON4(SO3)2)2"));
+        Map<String, String> testCaseMap = new LinkedHashMap<>();
+        testCaseMap.put("H2O", "H2O");
+        testCaseMap.put("Mg(OH)2", "H2MgO2");
+        testCaseMap.put("K4(ON4(SO3)2)2", "K4N8O14S4");
+        testCaseMap.put(
+            "((N42)24(OB40Li30CHe3O48LiNN26)33(C12Li48N30H13HBe31)21(BHN30Li26BCBe47N40)15(H5)16)14",
+            "B18900Be18984C4200H5446He1386Li33894N50106O22638"
+        );
+
+        testCaseMap.entrySet().stream()
+            .forEach(entry -> {
+                String atomCount = solution.countOfAtoms(entry.getKey());
+
+                if (entry.getValue().equals(atomCount)) {
+                    System.out.println("Test Passed!");
+                    System.out.println("---");
+                } else {
+                    System.out.println("Test Failed!");
+                    System.out.println("Expected: " + entry.getValue());
+                    System.out.println("Actual: " + atomCount);
+                    System.out.println("---");
+                }
+            });
     }
 }
-
