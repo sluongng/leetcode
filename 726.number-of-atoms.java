@@ -1,6 +1,7 @@
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /*
@@ -123,87 +124,83 @@ class Solution {
             // atom and numberString
             // and store the content into current atomList
 
-            boolean isTokenTerminated = isLastChar;
-            if (!isLastChar) {
-                char nextChar = formula.charAt(i + 1);
+            if (currChar != '(' && currChar != ')') {
 
-                isTokenTerminated |= Character.isUpperCase(nextChar);
-                isTokenTerminated |= nextChar == '(';
-                isTokenTerminated |= nextChar == ')';
-            }
+                if (Character.isLowerCase(currChar)) {
+                    atom.append(currChar);
 
-            if (Character.isLowerCase(currChar)) {
+                } else if (Character.isUpperCase(currChar)) {
 
-                atom.append(currChar);
+                    atom.append(currChar);
 
-            } else if (Character.isUpperCase(currChar)) {
+                } else if (Character.isDigit(currChar)) {
 
-                atom.append(currChar);
+                    numberString.append(currChar);
+                }
 
-            } else if (Character.isDigit(currChar)) {
+                boolean isTokenTerminated = isLastChar;
+                if (!isLastChar) {
+                    char nextChar = formula.charAt(i + 1);
 
-                numberString.append(currChar);
+                    isTokenTerminated |= Character.isUpperCase(nextChar);
+                    isTokenTerminated |= nextChar == '(';
+                    isTokenTerminated |= nextChar == ')';
+                }
 
+                if (isTokenTerminated) {
+
+                    String atomName = atom.toString();
+                    String countStr = numberString.toString();
+                    int atomCount = countStr.isEmpty() ? 1 : Integer.valueOf(countStr);
+
+                    if (!atomName.isEmpty()) {
+                        if (atomList.containsKey(atomName)) {
+                            atomList.replace(atomName, atomList.get(atomName) + atomCount);
+                        } else {
+                            atomList.put(atomName, atomCount);
+                        }
+                    }
+
+                    atom = new StringBuilder();
+                    numberString = new StringBuilder();
+                }
             } else if (currChar == '(') {
 
-                bracketStack.push(atomList);
-                atomList = new LinkedHashMap<String, Integer>();
+                if (!atomList.isEmpty()) {
+                    bracketStack.push(atomList);
+                    atomList = new LinkedHashMap<String, Integer>();
+                }
 
             } else if (currChar == ')') {
 
-                // Something wrong here
-
-                int multiplier = 1;
-
-                if (!isTokenTerminated) {
-                    i++;
-
-                    while (i < formula.length() && Character.isDigit(formula.charAt(i))) {
-                        numberString.append(formula.charAt(i));
+                if (isLastChar) {
+                    continue;
+                } else {
+                    while (i + 1 < formula.length() && Character.isDigit(formula.charAt(i + 1))) {
+                        numberString.append(formula.charAt(i + 1));
                         i++;
                     }
 
-                    multiplier = Integer.valueOf(numberString.toString());
+                    String multiplierStr = numberString.toString();
                     numberString = new StringBuilder();
-                }
-                final int multiplierFinal = multiplier;
 
-                Map<String, Integer> oldAtomList = bracketStack.empty() ? new LinkedHashMap<>() : bracketStack.pop();
+                    int multiplier = "".equals(multiplierStr) ? 1 : Integer.valueOf(multiplierStr);
 
-                atomList.entrySet().stream().forEach(entry -> {
-                    int valueToAdd = entry.getValue() * multiplierFinal;
+                    atomList = atomList.entrySet().stream()
+                            .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue() * multiplier));
 
-                    if (oldAtomList.containsKey(entry.getKey())) {
-                        valueToAdd += oldAtomList.get(entry.getKey());
+                    if (!bracketStack.empty()) {
+                        for (Entry<String, Integer> entry : bracketStack.pop().entrySet()) {
 
-                        oldAtomList.replace(entry.getKey(), valueToAdd);
-
-                    } else {
-                        oldAtomList.put(entry.getKey(), valueToAdd);
-                    }
-                });
-
-                atomList = oldAtomList;
-
-                isTokenTerminated = false;
-            }
-
-            if (isTokenTerminated) {
-
-                String atomName = atom.toString();
-                String countStr = numberString.toString();
-                int atomCount = countStr.isEmpty() ? 1 : Integer.valueOf(countStr);
-
-                if (!atomName.isEmpty()) {
-                    if (atomList.containsKey(atomName)) {
-                        atomList.replace(atomName, atomList.get(atomName) + atomCount);
-                    } else {
-                        atomList.put(atomName, atomCount);
+                            if (atomList.containsKey(entry.getKey())) {
+                                atomList.replace(entry.getKey(), entry.getValue() + atomList.get(entry.getKey()));
+                            } else {
+                                atomList.put(entry.getKey(), entry.getValue());
+                            }
+                        }
                     }
                 }
 
-                atom = new StringBuilder();
-                numberString = new StringBuilder();
             }
         }
 
@@ -219,24 +216,24 @@ class Solution {
         testCaseMap.put("H2O", "H2O");
         testCaseMap.put("Mg(OH)2", "H2MgO2");
         testCaseMap.put("K4(ON4(SO3)2)2", "K4N8O14S4");
+        testCaseMap.put("((N42)24(OB40Li30CHe3O48LiNN26)33(C12Li48N30H13HBe31)21(BHN30Li26BCBe47N40)15(H5)16)14",
+                "B18900Be18984C4200H5446He1386Li33894N50106O22638");
         testCaseMap.put(
-            "((N42)24(OB40Li30CHe3O48LiNN26)33(C12Li48N30H13HBe31)21(BHN30Li26BCBe47N40)15(H5)16)14",
-            "B18900Be18984C4200H5446He1386Li33894N50106O22638"
-        );
+                "(Db40Hs6Sc10I28IrBe22)8((Np25Lu36Ge46)46(Ta28Lv16Fe38Sn11PbCa23Ta37)26(Li35Hf11I38Po43Sg10Tl19BrZn24)19(Au3CePa23Ac36Hs7Es35AlTlGdRa7)34(Nb38Cu7Cd14)16)13",
+                "Ac15912Al442Au1326Be176Br247Ca7774Cd2912Ce442Cu1456Db320Es15470Fe12844Gd442Ge27508Hf2717Hs3142I9610Ir8Li8645Lu21528Lv5408Nb7904Np14950Pa10166Pb338Po10621Ra3094Sc80Sg2470Sn3718Ta21970Tl5135Zn5928");
 
-        testCaseMap.entrySet().stream()
-            .forEach(entry -> {
-                String atomCount = solution.countOfAtoms(entry.getKey());
+        testCaseMap.entrySet().stream().forEach(entry -> {
+            String atomCount = solution.countOfAtoms(entry.getKey());
 
-                if (entry.getValue().equals(atomCount)) {
-                    System.out.println("Test Passed!");
-                    System.out.println("---");
-                } else {
-                    System.out.println("Test Failed!");
-                    System.out.println("Expected: " + entry.getValue());
-                    System.out.println("Actual: " + atomCount);
-                    System.out.println("---");
-                }
-            });
+            if (entry.getValue().equals(atomCount)) {
+                System.out.println("Test Passed!");
+                System.out.println("---");
+            } else {
+                System.out.println("Test Failed!");
+                System.out.println("Expected: " + entry.getValue());
+                System.out.println("Actual: " + atomCount);
+                System.out.println("---");
+            }
+        });
     }
 }
