@@ -166,10 +166,8 @@ class Solution {
                 }
             } else if (currChar == '(') {
 
-                if (!atomList.isEmpty()) {
-                    bracketStack.push(atomList);
-                    atomList = new LinkedHashMap<String, Integer>();
-                }
+                bracketStack.push(atomList);
+                atomList = new LinkedHashMap<String, Integer>();
 
             } else if (currChar == ')') {
 
@@ -187,19 +185,13 @@ class Solution {
                     int multiplier = "".equals(multiplierStr) ? 1 : Integer.valueOf(multiplierStr);
 
                     atomList = atomList.entrySet().stream()
-                        .collect(Collectors.toMap(
-                            Entry::getKey,
-                            entry -> entry.getValue() * multiplier
-                        ));
+                            .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue() * multiplier));
 
                     if (!bracketStack.empty()) {
                         for (Entry<String, Integer> entry : bracketStack.pop().entrySet()) {
 
                             if (atomList.containsKey(entry.getKey())) {
-                                atomList.replace(
-                                    entry.getKey(),
-                                    entry.getValue() + atomList.get(entry.getKey())
-                                );
+                                atomList.replace(entry.getKey(), entry.getValue() + atomList.get(entry.getKey()));
                             } else {
                                 atomList.put(entry.getKey(), entry.getValue());
                             }
@@ -223,7 +215,7 @@ class Solution {
         testCaseMap.put("Mg(OH)2", "H2MgO2");
         testCaseMap.put("K4(ON4(SO3)2)2", "K4N8O14S4");
         testCaseMap.put("((N42)24(OB40Li30CHe3O48LiNN26)33(C12Li48N30H13HBe31)21(BHN30Li26BCBe47N40)15(H5)16)14",
-                "B18900Be18984C4200H5446He1386Li33894N50106O22638");
+        "B18900Be18984C4200H5446He1386Li33894N50106O22638");
         testCaseMap.put(
                 "(Db40Hs6Sc10I28IrBe22)8((Np25Lu36Ge46)46(Ta28Lv16Fe38Sn11PbCa23Ta37)26(Li35Hf11I38Po43Sg10Tl19BrZn24)19(Au3CePa23Ac36Hs7Es35AlTlGdRa7)34(Nb38Cu7Cd14)16)13",
                 "Ac15912Al442Au1326Be176Br247Ca7774Cd2912Ce442Cu1456Db320Es15470Fe12844Gd442Ge27508Hf2717Hs3142I9610Ir8Li8645Lu21528Lv5408Nb7904Np14950Pa10166Pb338Po10621Ra3094Sc80Sg2470Sn3718Ta21970Tl5135Zn5928");
