@@ -75,7 +75,7 @@ class MyCalendar {
             return true;
         }
 
-        for(Entry<K,V> entry : bookKeeper.entrySet()) {
+        for(Map.Entry<Integer, Integer> entry : bookKeeper.entrySet()) {
             if (
                 entry.getKey() == start
                 || (entry.getKey() < start && start < entry.getValue())
@@ -87,7 +87,7 @@ class MyCalendar {
 
         bookKeeper.put(start, end);
 
-        return false;
+        return true;
     }
 }
 
