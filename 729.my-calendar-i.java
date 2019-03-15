@@ -75,6 +75,12 @@ class MyCalendar {
             return true;
         }
 
+        // current Solution: O(n)
+        // instead of traversing the entire list of existing booking,
+        // we can use a binary search for 
+        // the start time closest after(greater than) given start time
+        // this could reduce the solution to O(logn) instead
+
         for(Map.Entry<Integer, Integer> entry : bookKeeper.entrySet()) {
             if (
                 entry.getKey() == start
