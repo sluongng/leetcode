@@ -1,5 +1,6 @@
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 /*
@@ -61,38 +62,30 @@ import java.util.Map.Entry;
  */
 class MyCalendar {
 
-    Map<Integer, Integer> bookKeeper;
+    TreeMap<Integer, Integer> bookKeeper;
 
     public MyCalendar() {
-        bookKeeper = new LinkedHashMap();
+        bookKeeper = new TreeMap();
     }
-    
+
     public boolean book(int start, int end) {
 
-        if(bookKeeper.isEmpty()) {
-            bookKeeper.put(start, end);
-
-            return true;
+        // TreeMap Look up is O(logn)
+        Integer floorKey = bookKeeper.floorKey(start);
+        if (floorKey != null && bookKeeper.get(floorKey) > end) {
+            return false;
         }
 
-        // current Solution: O(n)
-        // instead of traversing the entire list of existing booking,
-        // we can use a binary search for 
-        // the start time closest after(greater than) given start time
-        // this could reduce the solution to O(logn) instead
-
-        for(Map.Entry<Integer, Integer> entry : bookKeeper.entrySet()) {
-            if (
-                entry.getKey() == start
-                || (entry.getKey() < start && start < entry.getValue())
-                || (start < entry.getKey() && entry.getKey() < end)
-            ) {
-                return false;
-            }
+        // TreeMap Look up is O(logn)
+        Integer ceilingKey = bookKeeper.ceilingKey(start);
+        if (ceilingKey != null && bookKeeper.get(ceilingKey) < end) {
+            return false;
         }
 
+        // TreeMap insert, which is RedBlack tree insert, is O(logn)
         bookKeeper.put(start, end);
 
+        // Total runtime here is O(3logn) which is O(logn)
         return true;
     }
 }
