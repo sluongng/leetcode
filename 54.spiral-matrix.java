@@ -1,5 +1,4 @@
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
 
 /*
  * @lc app=leetcode id=54 lang=java
@@ -42,6 +41,11 @@ import java.util.List;
  */
 class Solution {
     public List<Integer> spiralOrder(int[][] matrix) {
+
+        if (matrix.length == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
         /**
          * direction of movement
          * - Left to Right: 0
@@ -58,17 +62,24 @@ class Solution {
         int width = matrix[0].length;
         int resultLength = height * width;
 
+        int upperBound = 0;
+        int lowerBound = height-1;
+        int rightBound = width-1;
+        int leftBound = 0;
+
         // index of current element
         int i = 0;
         int j = 0;
 
-        List<Integer> result = new LinkedList<>();
-        while (resultLength > 0) {
+        List<Integer> result = new LinkedList();
+        int index = 0;
+        while (index < resultLength) {
             result.add(matrix[i][j]);
 
             switch (direction) {
                 case 0:
-                    if (j + 1 == width) {
+                    if (j + 1 > rightBound) {
+                        upperBound++;
                         direction = changeDirection(direction);
                         i++;
                     } else {
@@ -76,7 +87,8 @@ class Solution {
                     }
                     break;
                 case 1:
-                    if (i + 1 == width) {
+                    if (i + 1 > lowerBound) {
+                        rightBound--;
                         direction = changeDirection(direction);
                         j--;
                     } else {
@@ -84,7 +96,8 @@ class Solution {
                     }
                     break;
                 case 2:
-                    if (j - 1 == width) {
+                    if (j - 1 < leftBound) {
+                        lowerBound--;
                         direction = changeDirection(direction);
                         i--;
                     } else {
@@ -92,7 +105,8 @@ class Solution {
                     }
                     break;
                 case 3:
-                    if (i - 1 == width) {
+                    if (i - 1 < upperBound) {
+                        leftBound++;
                         direction = changeDirection(direction);
                         j++;
                     } else {
@@ -102,7 +116,8 @@ class Solution {
                 default:
                     break;
             }
-            resultLength--;
+
+            index++;
         }
 
         return result;
@@ -117,7 +132,7 @@ class Solution {
         if (currDirection >= 3) {
             return 0;
         }
-        return currDirection++;
+        return currDirection+1;
     }
 }
 
