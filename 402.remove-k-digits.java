@@ -83,6 +83,14 @@ class Solution {
             stack.addLast(c);
         }
 
+        // Could be left over k caused by duplicated close digits
+        while (k > 0) {
+            stack.removeLast();
+            k--;
+        }
+
+        // Use Queue api, instead of stack, to restore the result string
+
         // Remove leading zeroes
         while (!stack.isEmpty() && stack.peek() == '0') {
             stack.pop();
