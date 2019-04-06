@@ -60,6 +60,7 @@ import java.util.Deque;
  */
 class Solution {
     public String removeKdigits(String num, int k) {
+        // Default trivia cases
         if (k == 0) {
             return num;
         }
@@ -71,8 +72,15 @@ class Solution {
         Deque<Character> stack = new ArrayDeque<>();
 
         for(char c : num.toCharArray()) {
-            // TODO: Some conditions
-            stack.push(c);
+            // peekLast() removeLast() addLast()
+            // used to compare with latest inserted element
+            // and replace it when we found a smaller one
+            while (k > 0 && !stack.isEmpty() && stack.peekLast() > c) {
+                stack.removeLast();
+                k--;
+            }
+
+            stack.addLast(c);
         }
 
         // Remove leading zeroes
@@ -80,16 +88,17 @@ class Solution {
             stack.pop();
         }
 
-        // Build result
+        // Trivia cases
         if (stack.isEmpty()) {
             return "0";
-        } else {
-            StringBuilder builder = new StringBuilder();
-            while(!stack.isEmpty()) {
-                builder.append(stack.pop());
-            }
-            return builder.toString();
+        } 
+
+        // Build result
+        StringBuilder builder = new StringBuilder();
+        while(!stack.isEmpty()) {
+            builder.append(stack.pop());
         }
+        return builder.toString();
     }
 }
 
