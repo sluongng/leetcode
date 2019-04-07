@@ -1,5 +1,3 @@
-import sun.print.resources.serviceui;
-
 /*
  * @lc app=leetcode id=212 lang=java
  *
@@ -51,31 +49,83 @@ class Solution {
     public List<String> findWords(char[][] board, String[] words) {
 
         Trie myDict = new Trie();
-        
+
         // Iterate over words and create a Trie structure
         for (String word : words) {
             // pointer trie set to root node
             Trie currentTrie = myDict;
-            
+
             // Traverse down the tree according to characters of current word
             for (char c : word.toCharArray()) {
                 int index = c - 'a';
-                if (currentTrie.getChild()[index] == null) {
-                    currentTrie.getChild()[index] = new Trie();
+                if (currentTrie.getNodes()[index] == null) {
+                    currentTrie.getNodes()[index] = new Trie();
                 }
-                currentTrie = currentTrie.getChild()[index];
+                currentTrie = currentTrie.getNodes()[index];
             }
 
             // At end of traversal, assign the word to child node
             currentTrie.setWord(word);
         }
 
+        List<String> result = new ArrayList<>();
         // Iterate over all elements of board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                int childIdx = board[i][j] - 'a';
+                dfs(board, i, j, myDict, result);
             }
         }
+
+        return result;
+    }
+
+    /**
+     * <Depth first search solution from leetcode>
+     * we scan the board from 1 corner to the opposite corner[(0,0) -> (maxHeight, maxWidth)]
+     * Duplication:
+     * each time we scan, we temporarily replace content of current cell with a mark character 
+     * which signify that it has been scanned to avoid circular navigation 
+     * 
+     * @param board
+     * @param i
+     * @param j
+     * @param node
+     * @param result
+     */
+    public void dfs(char[][] board, int i, int j, Trie dict, List<String> result) {
+        // Terminate if circular navigation on board
+        char currChar = board[i][j];
+        if (currChar == '#' ) {
+            return;
+        }
+
+        // there is no word found in dictionary Trie
+        int currIdx = currChar - 'a';
+        Trie currNode = dict.getNodes()[currIdx];
+        if (currNode == null) {
+            return;
+        }
+
+        if (!currNode.getWord().isEmpty()) {
+            result.add(currNode.getWord());
+
+            // we remove word out of dict 
+            // tree to avoid it being matched again
+            // This could also be avoid if we collect results using a Set instead of a List
+            currNode.setWord(null);
+        }
+
+        // Mark cell on board to avoid circular navigation
+        board[i][j] = '#';
+
+        // continue to navigate the board
+        if (i > 0) dfs(board, i - 1, j, currNode, result);
+        if (j > 0) dfs(board, i, j - 1, currNode, result);
+        if (i < board.length - 1) dfs(board, i + 1, j, currNode, result);
+        if (j < board[i].length - 1) dfs(board, i, j + 1, currNode, result);
+
+        // Restore the marking
+        board[i][j] = currChar;
     }
 }
 
