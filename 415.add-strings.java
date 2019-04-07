@@ -60,9 +60,4 @@ class Solution {
 
         return result;
     }
-
-    public static void main(String[] args) {
-        Solution mySolution = new Solution();
-        System.out.println(mySolution.addStrings("98", "9"));
-    }
 }
