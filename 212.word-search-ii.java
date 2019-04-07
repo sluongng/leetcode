@@ -80,11 +80,10 @@ class Solution {
     }
 
     /**
-     * <Depth first search solution from leetcode>
-     * we scan the board from 1 corner to the opposite corner[(0,0) -> (maxHeight, maxWidth)]
-     * Duplication:
-     * each time we scan, we temporarily replace content of current cell with a mark character 
-     * which signify that it has been scanned to avoid circular navigation 
+     * <Depth first search solution from leetcode> we scan the board from 1 corner
+     * to the opposite corner[(0,0) -> (maxHeight, maxWidth)] Duplication: each time
+     * we scan, we temporarily replace content of current cell with a mark character
+     * which signify that it has been scanned to avoid circular navigation
      * 
      * @param board
      * @param i
@@ -95,7 +94,7 @@ class Solution {
     public void dfs(char[][] board, int i, int j, Trie dict, List<String> result) {
         // Terminate if circular navigation on board
         char currChar = board[i][j];
-        if (currChar == '#' ) {
+        if (currChar == '#') {
             return;
         }
 
@@ -106,10 +105,10 @@ class Solution {
             return;
         }
 
-        if (!currNode.getWord().isEmpty()) {
+        if (currNode.getWord() != null && !currNode.getWord().isEmpty()) {
             result.add(currNode.getWord());
 
-            // we remove word out of dict 
+            // we remove word out of dict
             // tree to avoid it being matched again
             // This could also be avoid if we collect results using a Set instead of a List
             currNode.setWord(null);
@@ -119,45 +118,42 @@ class Solution {
         board[i][j] = '#';
 
         // continue to navigate the board
-        if (i > 0) dfs(board, i - 1, j, currNode, result);
-        if (j > 0) dfs(board, i, j - 1, currNode, result);
-        if (i < board.length - 1) dfs(board, i + 1, j, currNode, result);
-        if (j < board[i].length - 1) dfs(board, i, j + 1, currNode, result);
+        if (i > 0)
+            dfs(board, i - 1, j, currNode, result);
+        if (j > 0)
+            dfs(board, i, j - 1, currNode, result);
+        if (i < board.length - 1)
+            dfs(board, i + 1, j, currNode, result);
+        if (j < board[i].length - 1)
+            dfs(board, i, j + 1, currNode, result);
 
         // Restore the marking
         board[i][j] = currChar;
     }
-}
 
 class Trie {
     // 26 character in the alphabets
     // index is calculated by `int index = currChar - 'a'`
-    private Trie[] child = new Trie[26];
+    private Trie[] nodes = new Trie[26];
     private String word = "";
 
     public Trie() {
     }
 
     /**
-     * @return the child
+     * @return the nodes
      */
-    public Trie[] getChild() {
-        return child;
+    public Trie[] getNodes() {
+        return nodes;
     }
 
-    /**
-     * @param child the child to set
-     */
-    public void setChild(Trie[] child) {
-        this.child = child;
-    }
     /**
      * @return the word
      */
     public String getWord() {
         return word;
     }
-    
+
     /**
      * @param word the word to set
      */
@@ -165,4 +161,4 @@ class Trie {
         this.word = word;
     }
 }
-
+}
