@@ -1,123 +1,159 @@
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /*
- * @lc app=leetcode id=54 lang=java
+ * @lc app=leetcode id=212 lang=java
  *
- * [54] Spiral Matrix
+ * [212] Word Search II
  *
- * https://leetcode.com/problems/spiral-matrix/description/
+ * https://leetcode.com/problems/word-search-ii/description/
  *
  * algorithms
- * Medium (29.97%)
- * Total Accepted:    219.9K
- * Total Submissions: 733.7K
- * Testcase Example:  '[[1,2,3],[4,5,6],[7,8,9]]'
+ * Hard (27.96%)
+ * Total Accepted:    104.5K
+ * Total Submissions: 373.6K
+ * Testcase Example:  '[["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]]\n["oath","pea","eat","rain"]'
  *
- * Given a matrix of m x n elements (m rows, n columns), return all elements of
- * the matrix in spiral order.
+ * Given a 2D board and a list of words from the dictionary, find all words in
+ * the board.
  * 
- * Example 1:
+ * Each word must be constructed from letters of sequentially adjacent cell,
+ * where "adjacent" cells are those horizontally or vertically neighboring. The
+ * same letter cell may not be used more than once in a word.
  * 
  * 
- * Input:
- * [
- * ⁠[ 1, 2, 3 ],
- * ⁠[ 4, 5, 6 ],
- * ⁠[ 7, 8, 9 ]
+ * 
+ * Example:
+ * 
+ * 
+ * Input: 
+ * board = [
+ * ⁠ ['o','a','a','n'],
+ * ⁠ ['e','t','a','e'],
+ * ⁠ ['i','h','k','r'],
+ * ⁠ ['i','f','l','v']
  * ]
- * Output: [1,2,3,6,9,8,7,4,5]
+ * words = ["oath","pea","eat","rain"]
+ * 
+ * Output: ["eat","oath"]
  * 
  * 
- * Example 2:
  * 
- * Input:
- * [
- * ⁠ [1, 2, 3, 4],
- * ⁠ [5, 6, 7, 8],
- * ⁠ [9,10,11,12]
- * ]
- * Output: [1,2,3,4,8,12,11,10,9,5,6,7]
+ * 
+ * Note:
+ * 
+ * 
+ * All inputs are consist of lowercase letters a-z.
+ * The values of words are distinct.
+ * 
  * 
  */
 class Solution {
-    public List<Integer> spiralOrder(int[][] matrix) {
-        /**
-         * direction of movement
-         * - Left to Right: 0
-         * - Top to Bottom: 1
-         * - Right to Left: 2
-         * - Bottom to Top: 3
-         */
-        int direction = 0;
+    public List<String> findWords(char[][] board, String[] words) {
 
-        /**
-         * size of output array should be equal to (row * column) of input array
-         */
-        int height = matrix.length;
-        int width = matrix[0].length;
-        int resultLength = height * width;
+        Trie myDict = new Trie();
 
-        // index of current element
-        int i = 0;
-        int j = 0;
+        // Iterate over words and create a Trie structure
+        for (String word : words) {
+            // pointer trie set to root node
+            Trie currentTrie = myDict;
 
-        List<Integer> result = new LinkedList<>();
-        while (resultLength > 0) {
-            result.add(matrix[i][j]);
-
-            switch (direction) {
-                case 0:
-                    if (j + 1 == width) {
-                        direction = changeDirection(direction);
-                        i++;
-                    } else {
-                        j++;
-                    }
-                    break;
-                case 1:
-                    if (i + 1 == width) {
-                        direction = changeDirection(direction);
-                        j--;
-                    } else {
-                        i++;
-                    }
-                    break;
-                case 2:
-                    if (j - 1 == width) {
-                        direction = changeDirection(direction);
-                        i--;
-                    } else {
-                        j--;
-                    }
-                    break;
-                case 3:
-                    if (i - 1 == width) {
-                        direction = changeDirection(direction);
-                        j++;
-                    } else {
-                        i--;
-                    }
-                    break;
-                default:
-                    break;
+            // Traverse down the tree according to characters of current word
+            for (char c : word.toCharArray()) {
+                int index = c - 'a';
+                if (currentTrie.getChild()[index] == null) {
+                    currentTrie.getChild()[index] = new Trie();
+                }
+                currentTrie = currentTrie.getChild()[index];
             }
-            resultLength--;
+
+            // At end of traversal, assign the word to child node
+            currentTrie.setWord(word);
         }
 
-        return result;
+        // Iterate over all elements of board
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                int childIdx = board[i][j] - 'a';
+            }
+        }
+
+        return Arrays.asList("Hello", "World");
     }
 
-    /**
-     * used to change current direction
-     * @param currDirection current direction represented by integer 0 <= i <= 3
-     * @return new direction
-     */
-    private static int changeDirection(int currDirection) {
-        if (currDirection >= 3) {
-            return 0;
-        }
-        return currDirection++;
+    public static void main(String[] args) {
+        Solution mySol = new Solution();
+
+        /*
+         * Input: 
+         * board = [
+         * ⁠ ['o','a','a','n'],
+         * ⁠ ['e','t','a','e'],
+         * ⁠ ['i','h','k','r'],
+         * ⁠ ['i','f','l','v']
+         * ]
+         * words = ["oath","pea","eat","rain"]
+         * 
+         * Output: ["eat","oath"]
+         */
+        char[][] board = {
+          {'o','a','a','n'},
+          {'e','t','a','e'},
+          {'i','h','k','r'},
+          {'i','f','l','v'}
+        };
+        String[] words = {"oath","pea","eat","rain"};
+        // for (int i = 0; i < board.length; i++) {
+        //     for (int j = 0; j < board[i].length; j++) {
+        //         System.out.print(board[i][j]);
+        //     }
+        //     System.out.println();
+        // }
+        // for (String w : words) {
+        //     System.out.println(w);
+        // }
+
+        List<String> answer = mySol.findWords(board, words);
+        answer.forEach(System.out::println);
     }
 }
 
+class Trie {
+    // 26 character in the alphabets
+    // index is calculated by `int index = currChar - 'a'`
+    private Trie[] child = new Trie[26];
+    private String word = "";
+
+    public Trie() {
+    }
+
+    /**
+     * @return the child
+     */
+    public Trie[] getChild() {
+        return child;
+    }
+
+    /**
+     * @param child the child to set
+     */
+    public void setChild(Trie[] child) {
+        this.child = child;
+    }
+
+    /**
+     * @return the word
+     */
+    public String getWord() {
+        return word;
+    }
+
+    /**
+     * @param word the word to set
+     */
+    public void setWord(String word) {
+        this.word = word;
+    }
+}
